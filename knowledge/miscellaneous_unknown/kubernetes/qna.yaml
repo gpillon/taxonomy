@@ -1,5 +1,5 @@
 version: 3
-domain: k4all Kubernetes Home Installation
+domain: k4all Kubernetes Home Installation help
 created_by: gpillon
 seed_examples:
   - context: |
