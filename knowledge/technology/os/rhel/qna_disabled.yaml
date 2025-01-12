@@ -1,0 +1,75 @@
+version: 3
+domain: Red Hat Enterprise Linux Troubleshooting
+created_by: gpillon
+seed_examples:
+  - context: |
+      Red Hat Enterprise Linux (RHEL) is a popular enterprise-grade operating system. Users may encounter various issues, such as network connectivity problems, package management errors, and system performance concerns.
+    questions_and_answers:
+      - question: |
+          How can I resolve network connectivity issues on RHEL?
+        answer: |
+          To troubleshoot network connectivity issues on RHEL, you can:
+          1. Verify the network interface status using `nmcli device status`.
+          2. Check IP configuration with `ip addr show`.
+          3. Review DNS settings in `/etc/resolv.conf`.
+          4. Inspect firewall rules using `firewall-cmd --list-all`.
+          5. Examine network logs in `/var/log/messages` for any errors.
+      - question: |
+          What steps should I follow if a package fails to install on RHEL?
+        answer: |
+          If a package fails to install on RHEL:
+          1. Clear the YUM cache with `yum clean all`.
+          2. Update the package repository data using `yum update`.
+          3. Attempt to reinstall the package: `yum install <package_name>`.
+          4. Check for dependency issues and resolve them accordingly.
+          5. Review logs in `/var/log/yum.log` for detailed error messages.
+  - context: |
+      SELinux (Security-Enhanced Linux) is a security module in RHEL. It can sometimes block system processes or applications if not configured correctly.
+    questions_and_answers:
+      - question: |
+          How do I troubleshoot SELinux-related issues on RHEL?
+        answer: |
+          To troubleshoot SELinux issues:
+          1. Check the status with `sestatus`.
+          2. Review SELinux logs in `/var/log/audit/audit.log`.
+          3. Use `ausearch` and `audit2why` tools to interpret errors.
+          4. Temporarily disable SELinux for testing with `setenforce 0` (not recommended for production).
+      - question: |
+          How can I create a custom SELinux policy in RHEL?
+        answer: |
+          Use the `audit2allow` tool to generate a custom policy module:
+          1. Collect denied messages from `/var/log/audit/audit.log`.
+          2. Generate a custom policy with:
+             ```
+             grep "denied" /var/log/audit/audit.log | audit2allow -M custom_policy
+             ```
+          3. Load the policy with `semodule -i custom_policy.pp`.
+  - context: |
+      RHEL systems may experience performance issues due to high resource usage or misconfigured kernel parameters.
+    questions_and_answers:
+      - question: |
+          How can I optimize kernel parameters for better performance on RHEL?
+        answer: |
+          Edit `/etc/sysctl.conf` to adjust kernel parameters. Example:
+          ```
+          vm.swappiness=10
+          fs.file-max=2097152
+          ```
+          Then apply the changes with `sysctl -p`.
+      - question: |
+          What tools can I use to analyze system performance on RHEL?
+        answer: |
+          Use tools like:
+          1. `top` or `htop` for real-time resource monitoring.
+          2. `iostat` for disk performance.
+          3. `vmstat` for memory and CPU stats.
+          4. `perf` for detailed performance profiling.
+document_outline: |
+  This document provides troubleshooting steps for common issues encountered on Red Hat Enterprise Linux (RHEL), including network connectivity problems, package management errors, and system performance optimization.
+document:
+  repo: https://github.com/<Your_GitHub_Username>/rhel-troubleshooting.git
+  commit: <full_commit_SHA>
+  patterns:
+    - "*.md"
+    - "*.pdf"
+    - "docs/*.md"

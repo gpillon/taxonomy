@@ -1,0 +1,185 @@
+version: 3
+domain: k4all Kubernetes Home Installation
+created_by: gpillon
+seed_examples:
+  - context: |
+      k4all is a Kubernetes installer designed for home servers and virtual machines. It provides a pre-configured Fedora CoreOS environment tailored for Kubernetes, including essential tools and services such as Calico networking, the metrics server, Logical Volume Manager (LVM), and NGINX as an Ingress controller. The main configuration file is located at `/etc/k4all`.
+    questions_and_answers:
+      - question: |
+          Where can I find the main configuration file for k4all?
+        answer: |
+          The main configuration file for k4all is located at `/etc/k4all`.
+      - question: |
+          What are the key features included in k4all?
+        answer: |
+          k4all includes:
+          - Pre-configured Fedora CoreOS environment.
+          - Calico networking for robust network solutions.
+          - Metrics server for resource usage metrics collection.
+          - Logical Volume Manager (LVM) for managing storage volumes.
+          - NGINX as an Ingress controller for managing external access to services.
+      - question: |
+          How can I access the Kubernetes dashboard after installing k4all?
+        answer: |
+          After installing k4all:
+          1. SSH into your newly installed machine with `ssh core@<MACHINE_IP>` (default password: `core`).
+          2. Access the system with `sudo -i`.
+          3. Retrieve the dashboard token using:
+             ```
+             kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath="{.data.token}" | base64 -d
+             ```
+          4. Connect to the Kubernetes dashboard at `https://<your-ip>:32323/` using the retrieved token.
+      - question: |
+          What precautions should I take before installing k4all?
+        answer: |
+          Before installing k4all:
+          - **Warning**: The installation process is fully unattended and will format the entire `/dev/sda|vda|mmcblk` device. Ensure that your data is backed up before proceeding.
+          - Verify that your hardware meets the minimum requirements: 2 CPU cores and 4GB RAM.
+          - Prepare a bootable USB device with the k4all ISO.
+      - question: |
+          How do I reset a k4all installation?
+        answer: |
+          To reset a k4all installation:
+          1. Boot from the k4all installation media again.
+          2. Select the reset option from the menu to reformat and reinstall.
+  - context: |
+      k4all provides pre-configured components for Kubernetes, including Calico, LVM, and NGINX Ingress.
+    questions_and_answers:
+      - question: |
+          What networking solution is pre-configured in k4all?
+        answer: |
+          k4all uses Calico as the default CNI (Container Network Interface) for networking.
+      - question: |
+          What is the default storage solution in k4all?
+        answer: |
+          k4all uses Logical Volume Manager (LVM) for managing storage.
+      - question: |
+          How is the Ingress configured in k4all?
+        answer: |
+          k4all uses NGINX as the default Ingress controller, which manages external access to Kubernetes services.
+      - question: |
+          Can I customize the CNI in k4all?
+        answer: |
+          Yes, while Calico is the default, you can replace it with another CNI like Cilium by modifying the configuration before installation.
+      - question: |
+          How do I check the status of installed components in k4all?
+        answer: |
+          Run the following command:
+          ```
+          kubectl get pods -A
+          ```
+          This will display the status of all pods across all namespaces.
+  - context: |
+      Adding new nodes to a k4all Kubernetes cluster involves generating a join command on the bootstrap node.
+    questions_and_answers:
+      - question: |
+          How can I add a new node to an existing k4all cluster?
+        answer: |
+          1. On the bootstrap node, run `generate_join.sh` to obtain a join command.
+          2. Execute the command on the new node to add it to the cluster.
+      - question: |
+          How can I verify that a new node has joined the cluster?
+        answer: |
+          Run `kubectl get nodes` and check that the new node is listed.
+      - question: |
+          What should I do if a new node fails to join the cluster?
+        answer: |
+          Ensure the following:
+          - The join command is correctly executed.
+          - Network connectivity between the nodes is functioning.
+          - The k4all configuration matches across the nodes.
+      - question: |
+          How do I remove a node from a k4all cluster?
+        answer: |
+          Use `kubectl delete node <node-name>` to remove the node from the cluster.
+      - question: |
+          Can I add worker nodes with different hardware specifications?
+        answer: |
+          Yes, k4all supports heterogeneous nodes, but ensure that each node meets the minimum hardware requirements.
+  - context: |
+      k4all requires a minimal hardware configuration to function effectively. Users must ensure their systems meet these requirements.
+    questions_and_answers:
+      - question: |
+          What are the minimum hardware requirements for k4all?
+        answer: |
+          The minimum hardware requirements for k4all are:
+          - 2 CPU cores.
+          - 4 GB RAM.
+          - A bootable USB device for installation media.
+      - question: |
+          Can I run k4all on virtual machines?
+        answer: |
+          Yes, k4all is compatible with virtual machines as long as they meet the minimum hardware requirements.
+      - question: |
+          How much disk space does k4all require?
+        answer: |
+          At least 20 GB of disk space is recommended for the installation and operation of k4all.
+      - question: |
+          Can I expand storage after installing k4all?
+        answer: |
+          Yes, you can expand storage by adding new volumes and configuring them using LVM.
+      - question: |
+          Does k4all support high-availability setups?
+        answer: |
+          High availability is not included by default, but you can customize the configuration to set up an HA cluster manually.
+  - context: |
+      k4all includes various troubleshooting tools and maintenance procedures to help users manage their Kubernetes clusters effectively.
+    questions_and_answers:
+      - question: |
+          How do I check the logs of k4all components?
+        answer: |
+          To check component logs:
+          1. Use `journalctl` for system services:
+             ```
+             journalctl -u kubelet
+             ```
+          2. For pod logs:
+             ```
+             kubectl logs -n kube-system <pod-name>
+             ```
+      - question: |
+          What should I do if the k4all services fail to start?
+        answer: |
+          If services fail to start:
+          1. Check system status: `systemctl status kubelet`
+          2. View logs: `journalctl -xeu kubelet`
+          3. Verify configuration in `/etc/k4all`
+          4. Ensure all required ports are open
+          5. Check system resources usage
+      - question: |
+          How do I backup k4all configurations?
+        answer: |
+          To backup k4all configurations:
+          1. Save the contents of `/etc/k4all`
+          2. Export kubernetes resources:
+             ```
+             kubectl get all --all-namespaces -o yaml > cluster-backup.yaml
+             ```
+          3. Backup etcd data if needed:
+             ```
+             ETCDCTL_API=3 etcdctl snapshot save snapshot.db
+             ```
+      - question: |
+          How can I update k4all components?
+        answer: |
+          To update k4all components:
+          1. Check current versions: `kubectl get nodes -o wide`
+          2. Update CoreOS: `rpm-ostree upgrade`
+          3. Reboot the system
+          4. Update kubernetes components using the package manager
+      - question: |
+          What are common networking issues in k4all and how to resolve them?
+        answer: |
+          Common networking issues and solutions:
+          - Pod networking: Check Calico pods status and logs
+          - DNS issues: Verify CoreDNS pods are running
+          - Ingress problems: Check NGINX ingress controller logs
+          - Node connectivity: Use `kubectl get nodes` and verify network policies
+document_outline: |
+  k4all is a Kubernetes installer designed for home environments, providing a pre-configured Fedora CoreOS setup with essential tools and services. The main configuration file is located at `/etc/k4all`.
+document:
+  repo: https://github.com/gpillon/k4all.git
+  commit: <full_commit_SHA>
+  patterns:
+    - "*.md"
+    - "docs/*.md"
